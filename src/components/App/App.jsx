@@ -14,8 +14,7 @@ class App extends Component {
   handleFormSubmit = query => this.setState({ query, page: 1 });
 
   animatedScroll = () => {
-    const { height: cardHeight } = document.querySelector('ul>li').getBoundingClientRect();
-    scroll.scrollMore(cardHeight * 2.5);
+    scroll.scrollMore(window.innerHeight * 0.8);
   };
 
   handleLoadMore = () => {
