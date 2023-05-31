@@ -1,4 +1,5 @@
-import React, { Component } from 'react';
+import { Component } from 'react';
+import PropTypes from 'prop-types';
 import { fetchImages } from 'api/fetchImages';
 import { ImageGalleryItem } from 'components/ImageGalleryItem/ImageGalleryItem';
 import { Loader } from 'components/Loader/Loader';
@@ -22,42 +23,39 @@ class ImageGallery extends Component {
     responseLength: 0,
   };
 
+  static propTypes = {
+    query: PropTypes.string.isRequired,
+    page: PropTypes.number.isRequired,
+    handleLoadMore: PropTypes.func.isRequired,
+  };
+
   perPage = 12;
 
-  componentDidUpdate(prevProps, prevState) {
-    const prevQuery = prevProps.query;
-    const nextQuery = this.props.query;
-
-    const prevPage = prevProps.page;
-    const nextPage = this.props.page;
+  componentDidUpdate(prevProps, _) {
+    const { query: prevQuery, page: prevPage } = prevProps;
+    const { query: nextQuery, page: nextPage } = this.props;
 
     if (prevQuery !== nextQuery || prevPage < nextPage) {
-      const currentNewState = nextPage === 1
+      const newState = nextPage === 1
         ? { status: finiteStates.PENDING, images: [] }
         : { status: finiteStates.PENDING };
 
-      this.setState({ ...currentNewState });
+      this.setState({ ...newState });
 
       fetchImages(nextQuery, nextPage, this.perPage)
         .then(newImages =>
           this.setState(({ images }) => ({
             images: [...images, ...newImages],
-            status: 'resolved',
+            status: finiteStates.RESOLVED,
             responseLength: newImages.length,
           }))
         )
-        .catch(error => this.setState({ error, status: 'rejected' }));
+        .catch(error => this.setState({ error, status: finiteStates.REJECTED }));
     }
   }
 
   mapImages = ({ id, webformatURL, largeImageURL, tags }) => (
-    <ImageGalleryItem
-      key={id}
-      webformatURL={webformatURL}
-      largeImageURL={largeImageURL}
-      tags={tags}
-      handleOpenModal={this.props.handleOpenModal}
-    />
+    <ImageGalleryItem key={id} webformatURL={webformatURL} largeImageURL={largeImageURL} tags={tags} />
   );
 
   render() {

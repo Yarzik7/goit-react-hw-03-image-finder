@@ -1,4 +1,5 @@
-import React, { Component } from 'react';
+import { Component } from 'react';
+import PropTypes from 'prop-types';
 import { toast } from 'react-toastify';
 import { BsSearch } from 'react-icons/bs';
 import { SearchBar, SearchForm, SearchFormButton, SearchFormButtonLabel, SearchFormInput } from './Searchbar.styled';
@@ -7,6 +8,10 @@ class Searchbar extends Component {
   state = {
     query: '',
   };
+
+  static propTypes = {
+    onSubmit: PropTypes.func.isRequired
+  }
 
   handleQueryChange = ({ currentTarget: { name, value } }) => {
     this.setState({ [name]: value });
