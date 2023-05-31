@@ -65,13 +65,13 @@ class ImageGallery extends Component {
 
     return (
       <Section>
-        {status === 'idle' && <Greeting>Hello! Please enter the topic you would like to search images for</Greeting>}
+        {status === finiteStates.IDLE && <Greeting>Hello! Please enter the topic you would like to search images for</Greeting>}
 
-        {status !== 'idle' && !!images.length && <ImageGalleryBox>{images.map(this.mapImages)}</ImageGalleryBox>}
+        {status !== finiteStates.IDLE && !!images.length && <ImageGalleryBox>{images.map(this.mapImages)}</ImageGalleryBox>}
 
-        {status === 'pending' && <Loader />}
+        {status === finiteStates.PENDING && <Loader />}
 
-        {status === 'rejected' && <Error message={error.message} />}
+        {status === finiteStates.REJECTED && <Error message={error.message} />}
 
         {responseLength === PERPAGE && !!images.length && <Button handleLoadMore={this.props.handleLoadMore} />}
       </Section>
