@@ -21,7 +21,7 @@ class Searchbar extends Component {
     event.preventDefault();
 
     if (!this.state.query.trim()) {
-      toast.error('Введіть тему картинок');
+      toast.info('Enter a picture theme!');
       return;
     }
 

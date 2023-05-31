@@ -15,6 +15,8 @@ const finiteStates = {
   REJECTED: 'rejected',
 };
 
+const PERPAGE = 12;
+
 class ImageGallery extends Component {
   state = {
     images: [],
@@ -29,7 +31,7 @@ class ImageGallery extends Component {
     handleLoadMore: PropTypes.func.isRequired,
   };
 
-  perPage = 12;
+  
 
   componentDidUpdate(prevProps, _) {
     const { query: prevQuery, page: prevPage } = prevProps;
@@ -42,7 +44,7 @@ class ImageGallery extends Component {
 
       this.setState({ ...newState });
 
-      fetchImages(nextQuery, nextPage, this.perPage)
+      fetchImages(nextQuery, nextPage, PERPAGE)
         .then(newImages =>
           this.setState(({ images }) => ({
             images: [...images, ...newImages],
@@ -71,7 +73,7 @@ class ImageGallery extends Component {
 
         {status === 'rejected' && <Error message={error.message} />}
 
-        {responseLength === this.perPage && !!images.length && <Button handleLoadMore={this.props.handleLoadMore} />}
+        {responseLength === PERPAGE && !!images.length && <Button handleLoadMore={this.props.handleLoadMore} />}
       </Section>
     );
   }
