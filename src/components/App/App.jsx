@@ -1,6 +1,6 @@
 import { Component } from 'react';
-import { Searchbar } from './Searchbar/Searchbar';
-import { ImageGallery } from './ImageGallery/ImageGallery';
+import { Searchbar } from '../Searchbar/Searchbar';
+import { ImageGallery } from '../ImageGallery/ImageGallery';
 import { ToastContainer } from 'react-toastify';
 import { animateScroll as scroll } from 'react-scroll';
 import 'react-toastify/dist/ReactToastify.css';
