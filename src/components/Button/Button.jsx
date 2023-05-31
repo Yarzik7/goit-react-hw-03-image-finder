@@ -1,7 +1,7 @@
 import { ButtonLoadMore } from "./Button.styled";
 
-const Button = ({ countPage }) => {
-    return <ButtonLoadMore onClick={countPage}>Load more</ButtonLoadMore>;
+const Button = ({ handleLoadMore }) => {
+    return <ButtonLoadMore onClick={handleLoadMore}>Load more</ButtonLoadMore>;
 }
 
 export {Button}

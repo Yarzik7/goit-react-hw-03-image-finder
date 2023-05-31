@@ -1,53 +1,24 @@
-import React, { Component } from 'react';
+import { Component } from 'react';
 import { Searchbar } from './Searchbar/Searchbar';
 import { ImageGallery } from './ImageGallery/ImageGallery';
 import { ToastContainer } from 'react-toastify';
-import { Modal } from './Modal/Modal';
-import { ModalImage } from './Modal/Modal.styled';
 
 class App extends Component {
   state = {
     query: '',
-    showModal: false,
-    largeimage: null,
-    tags: null,
+    page: 1,
   };
 
-  toggleModal = () => {
-    this.setState(({ showModal }) => ({ showModal: !showModal }));
-  };
+  handleFormSubmit = query => this.setState({ query, page: 1 });
 
-  handleOpenModal = ({ currentTarget }) => {
-    if (!currentTarget.classList.contains('js-gallery-item')) {
-      return;
-    }
-  
-    const { largeimage, tags } = currentTarget.dataset;
-
-    this.setState(({ showModal }) => ({
-      showModal: !showModal,
-      largeimage,
-      tags,
-    }));
-  };
-
-  handleFormSubmit = query => {
-    this.setState({ query });
-  };
+  handleLoadMore = () => this.setState(({ page }) => ({ page: page + 1 }));
 
   render() {
-    const { showModal, largeimage, tags } = this.state;
     return (
       <>
-        {showModal && (
-          <Modal onClose={this.toggleModal}>
-            <ModalImage src={`${largeimage}`} alt={`${tags}`} />
-          </Modal>
-        )}
-
         <Searchbar onSubmit={this.handleFormSubmit} />
 
-        <ImageGallery query={this.state.query} handleOpenModal={this.handleOpenModal} />
+        <ImageGallery query={this.state.query} page={this.state.page} handleLoadMore={this.handleLoadMore} />
 
         <ToastContainer position="top-right" autoClose={3000} />
       </>

@@ -7,42 +7,48 @@ import { Greeting, ImageGalleryBox } from './ImageGallery.styled';
 import { Section } from 'components/Section/Section';
 import { Button } from 'components/Button/Button';
 
+const finiteStates = {
+  IDLE: 'idle',
+  PENDING: 'pending',
+  RESOLVED: 'resolved',
+  REJECTED: 'rejected',
+};
+
 class ImageGallery extends Component {
-  state = { images: [], error: null, status: 'idle', page: 1, perPage: 12, responseLength: 0 };
+  state = {
+    images: [],
+    error: null,
+    status: finiteStates.IDLE,
+    responseLength: 0,
+  };
+
+  perPage = 12;
 
   componentDidUpdate(prevProps, prevState) {
     const prevQuery = prevProps.query;
     const nextQuery = this.props.query;
 
-    const prevPage = prevState.page;
-    const nextPage = this.state.page;
+    const prevPage = prevProps.page;
+    const nextPage = this.props.page;
 
-    const perPage = this.state.perPage;
+    if (prevQuery !== nextQuery || prevPage < nextPage) {
+      const currentNewState = nextPage === 1
+        ? { status: finiteStates.PENDING, images: [] }
+        : { status: finiteStates.PENDING };
 
-    if (prevQuery !== nextQuery) {
-      this.setState({ status: 'pending', images: [], page: 1 });
-      fetchImages(nextQuery, 1, perPage)
-        .then(images => this.setState({ images, status: 'resolved', responseLength: images.length }))
-        .catch(error => this.setState({ error, status: 'rejected' }));
-    }
+      this.setState({ ...currentNewState });
 
-    if (prevPage < nextPage) {
-      this.setState({ status: 'pending' });
-      fetchImages(nextQuery, nextPage, perPage)
-        .then(nextImages =>
-          this.setState(({ images: prevImages }) => ({
-            images: [...prevImages, ...nextImages],
+      fetchImages(nextQuery, nextPage, this.perPage)
+        .then(newImages =>
+          this.setState(({ images }) => ({
+            images: [...images, ...newImages],
             status: 'resolved',
-            responseLength: nextImages.length,
+            responseLength: newImages.length,
           }))
         )
         .catch(error => this.setState({ error, status: 'rejected' }));
     }
   }
-
-  countPage = () => {
-    this.setState(({ page }) => ({ page: ++page }));
-  };
 
   mapImages = ({ id, webformatURL, largeImageURL, tags }) => (
     <ImageGalleryItem
@@ -55,44 +61,21 @@ class ImageGallery extends Component {
   );
 
   render() {
-    const { images, error, status, perPage, responseLength } = this.state;
+    const { images, error, status, responseLength } = this.state;
 
-    if (status === 'idle') {
-      return (
-        <Section>
-          <Greeting>Hello! Please enter the topic you would like to search images for</Greeting>
-        </Section>
-      );
-    }
+    return (
+      <Section>
+        {status === 'idle' && <Greeting>Hello! Please enter the topic you would like to search images for</Greeting>}
 
-    if (status === 'pending') {
-      return (
-        <Section>
-          <ImageGalleryBox>{images && images.map(this.mapImages)}</ImageGalleryBox>
-          <Loader />
-          {responseLength === perPage && <Button countPage={this.countPage} />}
-        </Section>
-      );
-    }
+        {status !== 'idle' && !!images.length && <ImageGalleryBox>{images.map(this.mapImages)}</ImageGalleryBox>}
 
-    if (status === 'rejected') {
-      return (
-        <Section>
-          <ImageGalleryBox>{images && images.map(this.mapImages)}</ImageGalleryBox>
-          <Error message={error.message} />
-          {responseLength === perPage && <Button countPage={this.countPage} />}
-        </Section>
-      );
-    }
+        {status === 'pending' && <Loader />}
 
-    if (status === 'resolved') {
-      return (
-        <Section>
-          <ImageGalleryBox>{images && images.map(this.mapImages)}</ImageGalleryBox>
-          {responseLength === perPage && <Button countPage={this.countPage} />}
-        </Section>
-      );
-    }
+        {status === 'rejected' && <Error message={error.message} />}
+
+        {responseLength === this.perPage && !!images.length && <Button handleLoadMore={this.props.handleLoadMore} />}
+      </Section>
+    );
   }
 }
 
